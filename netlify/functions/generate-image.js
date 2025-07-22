@@ -1,4 +1,4 @@
-[⚠️ Suspicious Content] // This is the complete backend code.
+// This is the complete backend code.
 // Put this file in: netlify/functions/generate-image.js
 
 const fetch = require('node-fetch');
@@ -30,13 +30,24 @@ exports.handler = async function(event) {
             body: JSON.stringify({ model, prompt, num_images, size })
         });
         
-        const data = await response.json();
-
-        // This checks if the AI API itself returned an error.
+        // Robust error handling: Check if the response is OK before trying to parse it.
         if (!response.ok) {
-            const errorMessage = data?.error?.message || `The AI API returned an error with status: ${response.status}`;
+            let errorData;
+            try {
+                // Try to parse the error response as JSON, as it might contain a detailed message.
+                errorData = await response.json();
+            } catch (e) {
+                // If the error response isn't JSON, read it as plain text.
+                const errorText = await response.text();
+                throw new Error(errorText || `The AI API returned a non-JSON error with status: ${response.status}`);
+            }
+            // Throw an error with the message from the API, or a fallback.
+            const errorMessage = errorData?.error?.message || `The AI API returned an error with status: ${response.status}`;
             throw new Error(errorMessage);
         }
+        
+        // If the response was OK, we can safely parse the JSON.
+        const data = await response.json();
         
         // If everything is successful, send the image data back to your React app.
         return {
@@ -45,7 +56,7 @@ exports.handler = async function(event) {
         };
 
     } catch (error) {
-        // If any error happens in our function, send back a clean JSON error message.
+        // If any error happens anywhere in our function, send back a clean JSON error message.
         // This prevents the "<!DOCTYPE" error.
         console.error("Serverless Function Error:", error);
         return {
