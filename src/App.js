@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+[⚠️ Suspicious Content] import React, { useState, useRef, useCallback } from 'react';
 
 // --- Configuration ---
 const API_URL = "/.netlify/functions/generate-image";
@@ -13,6 +13,7 @@ const Loader = () => ( <div className="text-center"><div className="loader mx-au
 // --- Main App Component ---
 export default function App() {
     const [prompt, setPrompt] = useState('');
+    const [model, setModel] = useState('img3'); // Re-added state for the model
     const [aspectRatio, setAspectRatio] = useState('1024x1024');
     const [count, setCount] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +46,7 @@ export default function App() {
         requestTimestamps.current.push(Date.now());
 
         const payload = {
-            model: 'img3',
+            model, // Now uses the selected model from the state
             prompt,
             num_images: parseInt(count, 10),
             size: aspectRatio
@@ -58,12 +59,9 @@ export default function App() {
                 body: JSON.stringify(payload)
             });
 
-            // This is the crucial fix. We now read the JSON body REGARDLESS of the status.
             const data = await response.json();
 
-            // NOW we check if the response was not OK.
             if (!response.ok) {
-                // If it failed, we use the specific error message from the JSON body.
                 throw new Error(data.error || "An unknown error occurred.");
             }
 
@@ -138,6 +136,17 @@ export default function App() {
                                 <label htmlFor="prompt" className="block text-sm font-medium text-gray-300 mb-2">Prompt</label>
                                 <textarea id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} rows="4" className="w-full bg-[#2a2931] border border-custom-soft rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-custom-purple transition" placeholder="A majestic dragon soaring through cloudy skies..."></textarea>
                             </div>
+
+                            {/* This is the new AI Model dropdown */}
+                            <div>
+                                <label htmlFor="ai-model" className="block text-sm font-medium text-gray-300 mb-2">AI Model</label>
+                                <select id="ai-model" value={model} onChange={(e) => setModel(e.target.value)} className="w-full bg-[#2a2931] border border-custom-soft rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-custom-purple transition">
+                                    <option value="img3">IMG3 (⚡️ Advanced)</option>
+                                    {/* You can add other models here if the API supports them */}
+                                    {/* <option value="some-other-model">Other Model</option> */}
+                                </select>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="aspect-ratio" className="block text-sm font-medium text-gray-300 mb-2">Aspect Ratio</label>
