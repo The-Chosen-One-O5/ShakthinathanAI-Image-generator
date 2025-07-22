@@ -42,7 +42,8 @@ const Loader = () => (
 export default function App() {
     // --- State Management ---
     const [prompt, setPrompt] = useState('');
-    const [model, setModel] = useState('img3');
+    // The model is currently fixed to 'img3', so the 'setModel' function is not needed.
+    const [model] = useState('img3'); 
     const [aspectRatio, setAspectRatio] = useState('1024x1024');
     const [count, setCount] = useState(1);
     
@@ -138,7 +139,8 @@ export default function App() {
                 <div className="w-full h-full grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(256px, 1fr))' }}>
                     {images.map((url, index) => (
                         <div key={index} className="aspect-square bg-gray-800 rounded-lg overflow-hidden">
-                            <img src={url} alt={`Generated image ${index + 1}`} className="w-full h-full object-cover" />
+                            {/* FIX: Changed alt text to be more descriptive for accessibility, resolving the ESLint warning. */}
+                            <img src={url} alt={prompt} className="w-full h-full object-cover" />
                         </div>
                     ))}
                 </div>
