@@ -1,4 +1,4 @@
-[⚠️ Suspicious Content] import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 
 // --- Configuration ---
 const API_URL = "/.netlify/functions/generate-image";
